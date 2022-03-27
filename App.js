@@ -11,20 +11,32 @@ import {
   ScrollView,
   Alert,
   FlatList,
-  TouchableOpacity,
+  ImageBackground,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
 
 import React, { useState, useEffect } from "react";
-import { Searchbar, List } from "react-native-paper";
+import { Searchbar } from "react-native-paper";
+
+import {
+  rainConditions,
+  thunderConditions,
+  possibleWeatherConditions,
+  snowConditions,
+} from "./utilities/weatherConditions";
+
+import { timeConvert } from "./utilities/timeConvert";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [weather, setWeather] = useState({});
   const [hourlyData, setHourlyData] = useState([]);
   const [query, setQuery] = useState("");
-  const getWeatherData = async (query = "Jhelum") => {
+  const [condition, setCondition] = useState("");
+  const [isDay, setIsDay] = useState("");
+
+  const getWeatherData = async (query = "London") => {
     const response = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=3471dc80414141b9ac2222948222403&q=${query}&days=1&aqi=yes&alerts=no`
     );
@@ -32,7 +44,11 @@ export default function App() {
     if (data.location) {
       setWeather(data);
       setHourlyData(data.forecast.forecastday[0].hour);
-      // console.log(data.forecast.forecastday[0].hour);
+      setCondition(data.current.condition.text);
+      setIsDay(data.current.is_day);
+      setIsLoading(false);
+    } else if (data.error.code === 1003) {
+      Alert.alert("Error", "Please enter a location !");
       setIsLoading(false);
     } else {
       Alert.alert("Error", data.error.message);
@@ -59,29 +75,73 @@ export default function App() {
           />
         ) : (
           <>
-            <View style={styles.searchContainer}>
-              <Searchbar
-                value={query}
-                onChangeText={(txt) => setQuery(txt)}
-                onSubmitEditing={() => {
-                  getWeatherData(query);
-                  setIsLoading(true);
-                }}
-                onIconPress={() => {
-                  getWeatherData(query);
-                  setIsLoading(true);
-                }}
-                placeholder="Search Location"
-              />
+            <View style={styles.searchplusbackgroundimagecontainer}>
+              <ImageBackground
+                opacity={0.7}
+                style={{ flex: 1, resizeMode: "cover" }}
+                source={
+                  (condition === "Clear" || condition === "Sunny") &&
+                  isDay === 1
+                    ? require("./assets/Weathers/DayClear-min.jpg")
+                    : condition === "Clear" && isDay === 0
+                    ? require("./assets/Weathers/NightClear-min.jpg")
+                    : (condition === "Partly cloudy" ||
+                        condition === "Cloudy") &&
+                      isDay === 1
+                    ? require("./assets/Weathers/DayPartlyCloudy-min.jpg")
+                    : (condition === "Partly cloudy" ||
+                        condition === "Cloudy") &&
+                      isDay === 0
+                    ? require("./assets/Weathers/NightCloudy-min.jpg")
+                    : condition === "Overcast" && isDay === 1
+                    ? require("./assets/Weathers/DayOvercast-min.jpg")
+                    : condition === "Overcast" && isDay === 0
+                    ? require("./assets/Weathers/NightOvercast-min.jpg")
+                    : condition === "Mist"
+                    ? require("./assets/Weathers/DayMist-min.jpg")
+                    : condition === "Blizzard"
+                    ? require("./assets/Weathers/Blizzard-min.jpg")
+                    : condition === "Fog" || condition === "Freezing fog"
+                    ? require("./assets/Weathers/Fog-min.jpg")
+                    : rainConditions.includes(condition)
+                    ? require("./assets/Weathers/Rain-min.jpg")
+                    : snowConditions.includes(condition)
+                    ? require("./assets/Weathers/DaySnow-min.jpg")
+                    : thunderConditions.includes(condition)
+                    ? require("./assets/Weathers/Thunder-min.jpg")
+                    : possibleWeatherConditions.includes(condition)
+                    ? require("./assets/Weathers/PossibleOvercast-min.jpg")
+                    : null
+                }
+              >
+                <View style={styles.searchContainer}>
+                  <Searchbar
+                    value={query}
+                    onChangeText={(txt) => setQuery(txt)}
+                    onSubmitEditing={() => {
+                      getWeatherData(query);
+                      setIsLoading(true);
+                    }}
+                    onIconPress={() => {
+                      getWeatherData(query);
+                      setIsLoading(true);
+                    }}
+                    placeholder="Search Location"
+                  />
+                  <Text style={styles.locationName}>
+                    {weather.location.name}
+                  </Text>
+                  <Text style={styles.locationCountry}>
+                    {weather.location.country}
+                  </Text>
 
-              <Text style={styles.locationName}>{weather.location.name}</Text>
-              <Text style={styles.locationCountry}>
-                {weather.location.country}
-              </Text>
-
-              <Text style={styles.weatherDateAndTime}>
-                {weather.location.localtime}
-              </Text>
+                  <Text style={styles.weatherDateAndTime}>
+                    {`${weather.location.localtime.split(" ")[0]} ${timeConvert(
+                      weather.location.localtime.split(" ")[1]
+                    )}`}
+                  </Text>
+                </View>
+              </ImageBackground>
             </View>
 
             <View style={styles.weatherDetailsContainer}>
@@ -129,7 +189,7 @@ export default function App() {
                         }}
                       >
                         <Text style={styles.timeStamp}>
-                          {item.time.split(" ")[1]}
+                          {timeConvert(item.time.split(" ")[1])}
                         </Text>
                         <Text style={styles.timeStamp}>
                           {item.condition.text}
@@ -249,12 +309,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
+  searchplusbackgroundimagecontainer: {
+    flex: 0.3,
+  },
   searchContainer: {
     alignItems: "center",
     marginTop: StatusBar.currentHeight ? StatusBar.currentHeight : null,
     padding: 15,
-    flex: 0.23,
-    // backgroundColor: "black",
+    flex: 1,
   },
   locationName: {
     fontSize: 35,
@@ -273,7 +335,7 @@ const styles = StyleSheet.create({
   },
 
   weatherDetailsContainer: {
-    flex: 0.77,
+    flex: 0.7,
     // backgroundColor: "pink",
   },
   temparatureDetailContainer: {
@@ -285,7 +347,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   temparature: {
-    marginTop: 15,
+    // marginTop: 15,
     color: "#fff",
     fontSize: 100,
   },
