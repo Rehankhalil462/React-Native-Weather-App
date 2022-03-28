@@ -13,8 +13,9 @@ import {
   FlatList,
   ImageBackground,
 } from "react-native";
-
+import { SocialMediaFooter } from "./utilities/SocialMediaFooter";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import React, { useState, useEffect } from "react";
 import { Searchbar } from "react-native-paper";
@@ -29,14 +30,14 @@ import {
 import { timeConvert } from "./utilities/timeConvert";
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [weather, setWeather] = useState({});
   const [hourlyData, setHourlyData] = useState([]);
   const [query, setQuery] = useState("");
   const [condition, setCondition] = useState("");
   const [isDay, setIsDay] = useState("");
 
-  const getWeatherData = async (query = "London") => {
+  const getWeatherData = async (query) => {
     const response = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=3471dc80414141b9ac2222948222403&q=${query}&days=1&aqi=yes&alerts=no`
     );
@@ -56,7 +57,7 @@ export default function App() {
     }
   };
   useEffect(() => {
-    getWeatherData();
+    // getWeatherData();
   }, []);
 
   return (
@@ -73,7 +74,7 @@ export default function App() {
             color="#34afaf"
             style={styles.weatherDetailsContainer}
           />
-        ) : (
+        ) : weather.location ? (
           <>
             <View style={styles.searchplusbackgroundimagecontainer}>
               <ImageBackground
@@ -294,6 +295,34 @@ export default function App() {
               </ScrollView>
             </View>
           </>
+        ) : (
+          <View style={styles.container}>
+            <View style={styles.mainScreenBeforeWeatherDataSearchContainer}>
+              <Searchbar
+                value={query}
+                onChangeText={(txt) => setQuery(txt)}
+                onSubmitEditing={() => {
+                  getWeatherData(query);
+                  setIsLoading(true);
+                }}
+                onIconPress={() => {
+                  getWeatherData(query);
+                  setIsLoading(true);
+                }}
+                placeholder="Search Location"
+              />
+            </View>
+            <View style={styles.mainScreenBeforeWeatherDataTextContainer}>
+              <Image
+                source={require("./assets/Weathers/weather.png")}
+                style={{ width: 220, height: 150, resizeMode: "contain" }}
+              />
+              <Text style={{ fontSize: 35, color: "#fff", marginTop: 15 }}>
+                A Minimal Weather App
+              </Text>
+            </View>
+            <SocialMediaFooter />
+          </View>
         )}
         <ExpoStatusBar style="light" />
       </LinearGradient>
@@ -384,5 +413,15 @@ const styles = StyleSheet.create({
   },
   precipitation: {
     color: "#fff",
+  },
+  mainScreenBeforeWeatherDataSearchContainer: {
+    flex: 0.3,
+    padding: 15,
+    alignItems: "center",
+    marginTop: StatusBar.currentHeight ? StatusBar.currentHeight : null,
+  },
+  mainScreenBeforeWeatherDataTextContainer: {
+    flex: 0.6,
+    alignItems: "center",
   },
 });
