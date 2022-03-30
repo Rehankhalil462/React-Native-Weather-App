@@ -1,52 +1,58 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
+import { timeConvert } from "./utilities/timeConvert";
+import { Searchbar } from "react-native-paper";
+
 import {
   StyleSheet,
   Text,
   View,
+  ImageBackground,
   ActivityIndicator,
   Platform,
   SafeAreaView,
   StatusBar,
-  Image,
   ScrollView,
   Alert,
-  FlatList,
-  ImageBackground,
 } from "react-native";
-import { SocialMediaFooter } from "./utilities/SocialMediaFooter";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import React, { useState, useEffect } from "react";
-import { Searchbar } from "react-native-paper";
-
 import {
   rainConditions,
+  snowConditions,
   thunderConditions,
   possibleWeatherConditions,
-  snowConditions,
 } from "./utilities/weatherConditions";
 
-import { timeConvert } from "./utilities/timeConvert";
+import React, { useState, useEffect } from "react";
+
+import { HourlyDataComponent } from "./src/components/HourlyData.component";
+import { PrecipitationandUVComponent } from "./src/components/PrecipitationandUV.component";
+import { TemparatureDetailComponent } from "./src/components/TemparatureDetail.component";
+import { LastUpdatedComponent } from "./src/components/LastUpdated.component";
+import { DailyDataComponent } from "./src/components/DailyData.component";
+
+import { FullHomeScreenBeforeWeather } from "./src/components/FullHomeScreenBeforeWeather";
+import { DailyDataDetails } from "./src/components/DailyDataDetails.component";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [weather, setWeather] = useState({});
-  const [hourlyData, setHourlyData] = useState([]);
   const [query, setQuery] = useState("");
+  const [isDay, setIsDay] = useState(null);
   const [condition, setCondition] = useState("");
-  const [isDay, setIsDay] = useState("");
 
   const getWeatherData = async (query) => {
+    console.log("query is called", query);
     const response = await fetch(
-      `https://api.weatherapi.com/v1/forecast.json?key=3471dc80414141b9ac2222948222403&q=${query}&days=1&aqi=yes&alerts=no`
+      `https://api.weatherapi.com/v1/forecast.json?key=3471dc80414141b9ac2222948222403&q=${query}&days=7&aqi=yes&alerts=no`
     );
     const data = await response.json();
     if (data.location) {
       setWeather(data);
-      setHourlyData(data.forecast.forecastday[0].hour);
-      setCondition(data.current.condition.text);
       setIsDay(data.current.is_day);
+      setCondition(data.current.condition.text);
+
       setIsLoading(false);
     } else if (data.error.code === 1003) {
       Alert.alert("Error", "Please enter a location !");
@@ -56,9 +62,48 @@ export default function App() {
       setIsLoading(false);
     }
   };
+
+  const loadWeatherHistory = async () => {
+    try {
+      setIsLoading(true);
+      const weatherData_A = await AsyncStorage.getItem("weatherHistory");
+      const isDay_A = await AsyncStorage.getItem("isDay");
+      const condition_A = await AsyncStorage.getItem("condition");
+      const query_A = await AsyncStorage.getItem("query");
+      if (
+        weatherData_A &&
+        JSON.parse(weatherData_A).hasOwnProperty("location")
+      ) {
+        setWeather(JSON.parse(weatherData_A));
+        setIsDay(JSON.parse(isDay_A));
+        setCondition(JSON.parse(condition_A));
+        setQuery(JSON.parse(query_A));
+
+        setIsLoading(false);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const saveWeatherHistory = async () => {
+    try {
+      await AsyncStorage.setItem("weatherHistory", JSON.stringify(weather));
+      await AsyncStorage.setItem("isDay", JSON.stringify(isDay));
+      await AsyncStorage.setItem("condition", JSON.stringify(condition));
+      await AsyncStorage.setItem("query", JSON.stringify(query));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    // getWeatherData();
+    loadWeatherHistory();
   }, []);
+
+  useEffect(() => {
+    saveWeatherHistory();
+  }, [weather]);
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
@@ -151,178 +196,33 @@ export default function App() {
                 nestedScrollEnabled={true}
                 style={{ flex: 1 }}
               >
-                <View style={styles.temparatureDetailContainer}>
-                  <View style={styles.temparatureValueandIconContainer}>
-                    <Image
-                      style={{ width: 100, height: 100 }}
-                      source={{
-                        uri: `https:${weather.current.condition.icon}`,
-                      }}
-                    />
-                    <Text style={styles.temparature}>
-                      {`${Math.round(weather.current.temp_c)}°`}
-                    </Text>
-                  </View>
-                  <Text
-                    style={styles.feelslikeTemparature}
-                  >{`Feels like ${Math.round(
-                    weather.current.feelslike_c
-                  )}°`}</Text>
-                  <Text style={styles.temparatureCondition}>
-                    {weather.current.condition.text}
-                  </Text>
-                </View>
-                <Text style={styles.weatherTimeStampText}>Hourly</Text>
-                <View style={styles.hourlyWeatherContainer}>
-                  <FlatList
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    data={hourlyData}
-                    renderItem={({ item }) => (
-                      <View
-                        style={{
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: 10,
-                          width: 100,
-                          height: 200,
-                        }}
-                      >
-                        <Text style={styles.timeStamp}>
-                          {timeConvert(item.time.split(" ")[1])}
-                        </Text>
-                        <Text style={styles.timeStamp}>
-                          {item.condition.text}
-                        </Text>
-                        <Image
-                          style={{ width: 60, height: 60 }}
-                          source={{
-                            uri: `https:${item.condition.icon}`,
-                          }}
-                        />
-                        <Text style={styles.precipitation}>{`${Math.round(
-                          item.precip_in
-                        )}%`}</Text>
-                        <Text style={styles.timeStamp}>{`${Math.round(
-                          item.temp_c
-                        )}°`}</Text>
-                      </View>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                </View>
-                <Text style={styles.weatherTimeStampText}>Daily</Text>
+                <TemparatureDetailComponent weather={weather} />
+                <LastUpdatedComponent
+                  weather={weather}
+                  getWeatherData={getWeatherData}
+                  setIsLoading={setIsLoading}
+                  query={query}
+                />
+                <PrecipitationandUVComponent weather={weather} />
 
-                <View style={styles.hourlyWeatherContainer}>
-                  <FlatList
-                    showsHorizontalScrollIndicator={false}
-                    horizontal={true}
-                    data={hourlyData}
-                    renderItem={({ item }) => (
-                      <View
-                        style={{
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: 10,
-                          width: 100,
-                          height: 200,
-                        }}
-                      >
-                        <Text style={styles.timeStamp}>
-                          {item.time.split(" ")[1]}
-                        </Text>
-                        <Text style={styles.timeStamp}>
-                          {item.condition.text}
-                        </Text>
-                        <Image
-                          style={{ width: 60, height: 60 }}
-                          source={{
-                            uri: `https:${item.condition.icon}`,
-                          }}
-                        />
-                        <Text style={styles.precipitation}>{`${Math.round(
-                          item.precip_in
-                        )}%`}</Text>
-                        <Text style={styles.timeStamp}>{`${Math.round(
-                          item.temp_c
-                        )}°`}</Text>
-                      </View>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                </View>
-                <View style={styles.hourlyWeatherContainer}>
-                  <FlatList
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    data={hourlyData}
-                    renderItem={({ item }) => (
-                      <View
-                        style={{
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: 10,
-                          width: 100,
-                          height: 200,
-                        }}
-                      >
-                        <Text style={styles.timeStamp}>
-                          {item.time.split(" ")[1]}
-                        </Text>
-                        <Text style={styles.timeStamp}>
-                          {item.condition.text}
-                        </Text>
-                        <Image
-                          style={{ width: 60, height: 60 }}
-                          source={{
-                            uri: `https:${item.condition.icon}`,
-                          }}
-                        />
-                        <Text style={styles.precipitation}>{`${Math.round(
-                          item.precip_in
-                        )}%`}</Text>
-                        <Text style={styles.timeStamp}>{`${Math.round(
-                          item.temp_c
-                        )}°`}</Text>
-                      </View>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                </View>
+                <Text style={styles.weatherTimeStampText}>Hourly</Text>
+                <HourlyDataComponent weather={weather} />
+
+                <Text style={styles.weatherTimeStampText}>Daily</Text>
+                <DailyDataComponent weather={weather} />
+                <Text style={styles.weatherTimeStampText}>Details</Text>
+
+                <DailyDataDetails weather={weather} />
               </ScrollView>
             </View>
           </>
         ) : (
-          <View style={styles.container}>
-            <View style={styles.mainScreenBeforeWeatherDataSearchContainer}>
-              <Searchbar
-                value={query}
-                onChangeText={(txt) => setQuery(txt)}
-                onSubmitEditing={() => {
-                  getWeatherData(query);
-                  setIsLoading(true);
-                }}
-                onIconPress={() => {
-                  getWeatherData(query);
-                  setIsLoading(true);
-                }}
-                placeholder="Search Location"
-              />
-            </View>
-            <View style={styles.mainScreenBeforeWeatherDataTextContainer}>
-              <Image
-                source={require("./assets/Weathers/weather.png")}
-                style={{ width: 220, height: 150, resizeMode: "contain" }}
-              />
-              <Text style={{ fontSize: 35, color: "#fff", marginTop: 15 }}>
-                A Minimal Weather App
-              </Text>
-            </View>
-            <SocialMediaFooter />
-          </View>
+          <FullHomeScreenBeforeWeather
+            getWeatherData={getWeatherData}
+            query={query}
+            setQuery={setQuery}
+            setIsLoading={setIsLoading}
+          />
         )}
         <ExpoStatusBar style="light" />
       </LinearGradient>
@@ -338,6 +238,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
+
   searchplusbackgroundimagecontainer: {
     flex: 0.3,
   },
@@ -367,30 +268,29 @@ const styles = StyleSheet.create({
     flex: 0.7,
     // backgroundColor: "pink",
   },
-  temparatureDetailContainer: {
-    // backgroundColor: "grey",
+  searchplusbackgroundimagecontainer: {
+    flex: 0.3,
+  },
+  searchContainer: {
     alignItems: "center",
+    marginTop: StatusBar.currentHeight ? StatusBar.currentHeight : null,
+    padding: 15,
+    flex: 1,
   },
-  temparatureValueandIconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  temparature: {
-    // marginTop: 15,
+  locationName: {
+    fontSize: 35,
     color: "#fff",
-    fontSize: 100,
+    marginTop: 15,
   },
-  feelslikeTemparature: {
+  locationCountry: {
+    fontSize: 15,
     color: "#fff",
-    fontSize: 22,
+  },
+  weatherDateAndTime: {
+    fontSize: 20,
     marginTop: 5,
-    opacity: 0.8,
-  },
-  temparatureCondition: {
     color: "#fff",
-    fontSize: 22,
-
-    marginTop: 5,
+    opacity: 0.7,
   },
   weatherTimeStampText: {
     color: "#fff",
