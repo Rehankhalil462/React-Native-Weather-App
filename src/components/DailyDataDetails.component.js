@@ -112,7 +112,7 @@ export const DailyDataDetails = ({ weather }) => {
             icon="temperature-celsius"
             style={{ margin: 0 }}
           />
-          <Text style={styles.timeStamp}>Temparature </Text>
+          <Text style={styles.timeStamp}>Current Temparature </Text>
         </View>
         <View style={styles.valuecontainer}>
           <Text style={styles.timeStamp}>{weather.current.temp_c}</Text>
@@ -128,12 +128,123 @@ export const DailyDataDetails = ({ weather }) => {
             icon="temperature-fahrenheit"
             style={{ margin: 0 }}
           />
-          <Text style={styles.timeStamp}>Temparature</Text>
+          <Text style={styles.timeStamp}>Current Temparature</Text>
         </View>
         <View style={styles.valuecontainer}>
           <Text style={styles.timeStamp}>{weather.current.temp_f}</Text>
         </View>
       </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="temperature-celsius"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Max Temparature </Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {Math.round(weather.forecast.forecastday[0].day.maxtemp_c)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="temperature-celsius"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Min Temparature </Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {Math.round(weather.forecast.forecastday[0].day.mintemp_c)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="temperature-fahrenheit"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Max Temparature</Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {Math.round(weather.forecast.forecastday[0].day.maxtemp_f)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="temperature-fahrenheit"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Min Temparature</Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {Math.round(weather.forecast.forecastday[0].day.mintemp_f)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="weather-lightning-rainy"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Chances Of Rain</Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {weather.forecast.forecastday[0].day.daily_chance_of_rain}%
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton color="#fff" icon="weather-snowy" style={{ margin: 0 }} />
+          <Text style={styles.timeStamp}>Chances Of Snow</Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>
+            {weather.forecast.forecastday[0].day.daily_chance_of_snow}%
+          </Text>
+        </View>
+      </View>
+
       <View style={{ paddingHorizontal: 40 }}>
         <Divider style={{ height: 2, backgroundColor: "#fff" }} />
       </View>
@@ -195,7 +306,7 @@ export const DailyDataDetails = ({ weather }) => {
         <View style={styles.iconandnamecontainer}>
           <IconButton
             color="#fff"
-            icon="weather-partly-cloudy"
+            icon="weather-cloudy"
             style={{ margin: 0 }}
           />
           <Text style={styles.timeStamp}>Clouds</Text>

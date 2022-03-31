@@ -26,7 +26,7 @@ export const LastUpdatedComponent = ({
         icon="refresh"
         animated={true}
         onPress={() => {
-          getWeatherData(query);
+          getWeatherData(weather.location.name);
           setIsLoading(true);
         }}
       />

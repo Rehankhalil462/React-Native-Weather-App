@@ -1,6 +1,7 @@
+import React, { useState, useEffect, useCallback } from "react";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { timeConvert } from "./utilities/timeConvert";
-import { Searchbar } from "react-native-paper";
+import { Searchbar, Divider } from "react-native-paper";
 
 import {
   StyleSheet,
@@ -11,8 +12,11 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
+  ToastAndroid,
   ScrollView,
+  BackHandler,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,8 +28,6 @@ import {
   possibleWeatherConditions,
 } from "./utilities/weatherConditions";
 
-import React, { useState, useEffect } from "react";
-
 import { HourlyDataComponent } from "./src/components/HourlyData.component";
 import { PrecipitationandUVComponent } from "./src/components/PrecipitationandUV.component";
 import { TemparatureDetailComponent } from "./src/components/TemparatureDetail.component";
@@ -35,8 +37,14 @@ import { DailyDataComponent } from "./src/components/DailyData.component";
 import { FullHomeScreenBeforeWeather } from "./src/components/FullHomeScreenBeforeWeather";
 import { DailyDataDetails } from "./src/components/DailyDataDetails.component";
 import { AirQualityComponent } from "./src/components/AirQuality.component";
+import {
+  FollowUsComponent,
+  PoweredByComponent,
+} from "./src/components/PoweredBy.component";
 
 export default function App() {
+  const [refreshing, setRefreshing] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [weather, setWeather] = useState({});
   const [query, setQuery] = useState("");
@@ -44,7 +52,6 @@ export default function App() {
   const [condition, setCondition] = useState("");
 
   const getWeatherData = async (query) => {
-    console.log("query is called", query);
     const response = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=3471dc80414141b9ac2222948222403&q=${query}&days=7&aqi=yes&alerts=no`
     );
@@ -98,9 +105,42 @@ export default function App() {
       console.log(e);
     }
   };
+  const showToast = () => {
+    ToastAndroid.show(
+      "Weather is restored from last search !",
+      ToastAndroid.LONG,
+      ToastAndroid.CENTER
+    );
+  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getWeatherData(weather.location.name);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  }, []);
 
+  const backAction = () => {
+    Alert.alert("Hold on !", "Are you sure you want to close this app?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      {
+        text: "YES",
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
   useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
     loadWeatherHistory();
+    showToast();
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
   useEffect(() => {
@@ -197,6 +237,18 @@ export default function App() {
                 showsVerticalScrollIndicator={false}
                 nestedScrollEnabled={true}
                 style={{ flex: 1 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={["#fff"]}
+                    progressBackgroundColor="#34afaf"
+                    tintColor="#34afaf"
+                    title="Refresh"
+                    titleColor="#34afaf"
+                    enabled={true}
+                  />
+                }
               >
                 <TemparatureDetailComponent weather={weather} />
                 <LastUpdatedComponent
@@ -218,6 +270,26 @@ export default function App() {
                 <Text style={styles.weatherTimeStampText}>Air Quality</Text>
 
                 <AirQualityComponent weather={weather} />
+                <View
+                  style={{
+                    paddingHorizontal: 20,
+                    paddingBottom: 20,
+                    paddingTop: 10,
+                  }}
+                >
+                  <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+                </View>
+                <PoweredByComponent
+                  textToShow={"Developed By : "}
+                  nameToShow={"Rehan Khalil"}
+                  siteURL={"https://rehankhalilportfolio.netlify.app"}
+                />
+                <PoweredByComponent
+                  textToShow={"Data Provided By  : "}
+                  nameToShow={"WeatherAPI.com"}
+                  siteURL={"https://www.weatherapi.com"}
+                />
+                <FollowUsComponent />
               </ScrollView>
             </View>
           </>
