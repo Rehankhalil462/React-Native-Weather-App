@@ -12,7 +12,7 @@ export const DailyDataComponent = ({ weather }) => {
         showsHorizontalScrollIndicator={false}
         horizontal={true}
         data={forecastday}
-        keyExtractor={(item) => Math.random()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
             style={{

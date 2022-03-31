@@ -34,6 +34,7 @@ import { DailyDataComponent } from "./src/components/DailyData.component";
 
 import { FullHomeScreenBeforeWeather } from "./src/components/FullHomeScreenBeforeWeather";
 import { DailyDataDetails } from "./src/components/DailyDataDetails.component";
+import { AirQualityComponent } from "./src/components/AirQuality.component";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,9 +50,9 @@ export default function App() {
     );
     const data = await response.json();
     if (data.location) {
-      setWeather(data);
       setIsDay(data.current.is_day);
       setCondition(data.current.condition.text);
+      setWeather(data);
 
       setIsLoading(false);
     } else if (data.error.code === 1003) {
@@ -65,7 +66,6 @@ export default function App() {
 
   const loadWeatherHistory = async () => {
     try {
-      setIsLoading(true);
       const weatherData_A = await AsyncStorage.getItem("weatherHistory");
       const isDay_A = await AsyncStorage.getItem("isDay");
       const condition_A = await AsyncStorage.getItem("condition");
@@ -74,11 +74,11 @@ export default function App() {
         weatherData_A &&
         JSON.parse(weatherData_A).hasOwnProperty("location")
       ) {
-        setWeather(JSON.parse(weatherData_A));
+        setIsLoading(true);
         setIsDay(JSON.parse(isDay_A));
         setCondition(JSON.parse(condition_A));
         setQuery(JSON.parse(query_A));
-
+        setWeather(JSON.parse(weatherData_A));
         setIsLoading(false);
       }
     } catch (e) {
@@ -87,11 +87,13 @@ export default function App() {
   };
 
   const saveWeatherHistory = async () => {
+    setIsLoading(true);
     try {
-      await AsyncStorage.setItem("weatherHistory", JSON.stringify(weather));
       await AsyncStorage.setItem("isDay", JSON.stringify(isDay));
       await AsyncStorage.setItem("condition", JSON.stringify(condition));
       await AsyncStorage.setItem("query", JSON.stringify(query));
+      await AsyncStorage.setItem("weatherHistory", JSON.stringify(weather));
+      setIsLoading(false);
     } catch (e) {
       console.log(e);
     }
@@ -213,6 +215,9 @@ export default function App() {
                 <Text style={styles.weatherTimeStampText}>Details</Text>
 
                 <DailyDataDetails weather={weather} />
+                <Text style={styles.weatherTimeStampText}>Air Quality</Text>
+
+                <AirQualityComponent weather={weather} />
               </ScrollView>
             </View>
           </>

@@ -43,11 +43,15 @@ export const DailyDataDetails = ({ weather }) => {
       </View>
       <View style={styles.listDataContainer}>
         <View style={styles.iconandnamecontainer}>
-          <IconButton color="#fff" icon="water-outline" style={{ margin: 0 }} />
+          <IconButton
+            color="#fff"
+            icon="white-balance-sunny"
+            style={{ margin: 0 }}
+          />
           <Text style={styles.timeStamp}>Humidity</Text>
         </View>
         <View style={styles.valuecontainer}>
-          <Text style={styles.timeStamp}>{weather.current.humidity}</Text>
+          <Text style={styles.timeStamp}>{weather.current.humidity}%</Text>
         </View>
       </View>
       <View style={{ paddingHorizontal: 40 }}>
@@ -55,11 +59,7 @@ export const DailyDataDetails = ({ weather }) => {
       </View>
       <View style={styles.listDataContainer}>
         <View style={styles.iconandnamecontainer}>
-          <IconButton
-            color="#fff"
-            icon="white-balance-sunny"
-            style={{ margin: 0 }}
-          />
+          <IconButton color="#fff" icon="water-outline" style={{ margin: 0 }} />
           <Text style={styles.timeStamp}>Precipitation</Text>
         </View>
         <View style={styles.valuecontainer}>
@@ -159,7 +159,7 @@ export const DailyDataDetails = ({ weather }) => {
         <View style={styles.iconandnamecontainer}>
           <IconButton
             color="#fff"
-            icon="weather-sunset-up"
+            icon="weather-sunset-down"
             style={{ margin: 0 }}
           />
           <Text style={styles.timeStamp}>Moonset</Text>
@@ -186,6 +186,34 @@ export const DailyDataDetails = ({ weather }) => {
           <Text style={styles.timeStamp}>
             {weather.forecast.forecastday[0].astro.moon_phase}
           </Text>
+        </View>
+      </View>
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton
+            color="#fff"
+            icon="weather-partly-cloudy"
+            style={{ margin: 0 }}
+          />
+          <Text style={styles.timeStamp}>Clouds</Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>{weather.current.cloud}%</Text>
+        </View>
+      </View>
+      <View style={{ paddingHorizontal: 40 }}>
+        <Divider style={{ height: 2, backgroundColor: "#fff" }} />
+      </View>
+      <View style={styles.listDataContainer}>
+        <View style={styles.iconandnamecontainer}>
+          <IconButton color="#fff" icon="weather-windy" style={{ margin: 0 }} />
+          <Text style={styles.timeStamp}>Wind Gust (kph) </Text>
+        </View>
+        <View style={styles.valuecontainer}>
+          <Text style={styles.timeStamp}>{weather.current.gust_kph}</Text>
         </View>
       </View>
     </View>

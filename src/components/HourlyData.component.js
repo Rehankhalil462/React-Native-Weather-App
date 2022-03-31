@@ -15,7 +15,7 @@ export const HourlyDataComponent = ({ weather }) => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={hourlyData}
-        keyExtractor={(item) => Math.random()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
             style={{
