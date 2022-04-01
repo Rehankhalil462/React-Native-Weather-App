@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { timeConvert } from "./utilities/timeConvert";
 import { Searchbar, Divider } from "react-native-paper";
@@ -108,17 +108,18 @@ export default function App() {
   const showToast = () => {
     ToastAndroid.show(
       "Weather is restored from last search !",
-      ToastAndroid.LONG,
+      ToastAndroid.SHORT,
       ToastAndroid.CENTER
     );
   };
-  const onRefresh = useCallback(() => {
+
+  const onRefresh = () => {
     setRefreshing(true);
     getWeatherData(weather.location.name);
     setTimeout(() => {
       setRefreshing(false);
     }, 1500);
-  }, []);
+  };
 
   const backAction = () => {
     Alert.alert("Hold on !", "Are you sure you want to close this app?", [
@@ -139,6 +140,7 @@ export default function App() {
 
     loadWeatherHistory();
     showToast();
+
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);

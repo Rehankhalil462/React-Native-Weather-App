@@ -1,14 +1,15 @@
 {
   "expo": {
-    "name": "Weather",
-    "slug": "Weather",
-    "version": "1.0.0",
+    "name": "Weather Forecast",
+    "slug": "WeatherApp",
+    "description": "A Minimal Weather App",
+    "version": "0.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#5a69c9"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.rehankhalil462.WeatherApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
