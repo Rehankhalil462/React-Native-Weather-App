@@ -6,7 +6,7 @@ export const TemparatureDetailComponent = ({ weather }) => {
     <View style={styles.temparatureDetailContainer}>
       <View style={styles.temparatureValueandIconContainer}>
         <Image
-          style={{ width: 100, height: 100 }}
+          style={styles.weatherIcon}
           source={{
             uri: `https:${weather.current.condition.icon}`,
           }}
@@ -40,28 +40,49 @@ export const TemparatureDetailComponent = ({ weather }) => {
 
 const styles = StyleSheet.create({
   temparatureDetailContainer: {
-    // backgroundColor: "grey",
     alignItems: "center",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
   },
   temparatureValueandIconContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 5,
+  },
+  weatherIcon: {
+    width: 110,
+    height: 110,
+    marginRight: 10,
   },
   temparature: {
-    // marginTop: 15,
     color: "#fff",
-    fontSize: 100,
+    fontSize: 110,
+    fontWeight: "300",
+    letterSpacing: -2,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   feelslikeTemparature: {
     color: "#fff",
-    fontSize: 22,
-    marginTop: 5,
-    opacity: 0.8,
+    fontSize: 18,
+    marginTop: 8,
+    opacity: 0.9,
+    fontWeight: "500",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   temparatureCondition: {
     color: "#fff",
-    fontSize: 22,
-
-    marginTop: 5,
+    fontSize: 24,
+    marginTop: 8,
+    fontWeight: "600",
+    textTransform: "capitalize",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    letterSpacing: 0.5,
   },
 });
