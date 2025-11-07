@@ -6,6 +6,15 @@ A beautiful, premium weather forecast application built with React Native and Ex
 ![Expo](https://img.shields.io/badge/Expo-54.0.22-black.svg)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81.5-61DAFB.svg)
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="assets/screenshots/1.jpeg" alt="Screenshot 1" width="200" />
+  <img src="assets/screenshots/2.jpeg" alt="Screenshot 2" width="200" />
+  <img src="assets/screenshots/3.jpeg" alt="Screenshot 3" width="200" />
+  <img src="assets/screenshots/4.jpeg" alt="Screenshot 4" width="200" />
+</div>
+
 ## ✨ Features
 
 ### 🌤️ Weather Information
@@ -195,12 +204,6 @@ Both files use `process.env.EXPO_PUBLIC_WEATHER_API_KEY` to read the API key fro
 ## 📄 License
 
 This project is licensed under the MIT License.
-
-## 🙏 Acknowledgments
-
-- [WeatherAPI.com](https://www.weatherapi.com/) for providing weather data
-- [Expo](https://expo.dev/) for the amazing development platform
-- [React Native Paper](https://callstack.github.io/react-native-paper/) for UI components
 
 ## 📝 Version History
 
